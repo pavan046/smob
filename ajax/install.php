@@ -113,11 +113,11 @@ function setupSMOB() {
 define('SMOB_ROOT', '$smob_root');
 define('PURGE', '$purge');
 
-//define('HUB_URL', 'http://pubsubhubbub.appspot.com/');
+//define('HUB_URL', 'http://localhost:8080/');
 //define('HUB_URL_PUBLISH', 'http://smob.superfeedr.com/');
 //define('HUB_URL_SUBSCRIBE', 'http://smob.superfeedr.com/');
-define('HUB_URL_PUBLISH', 'http://pubsubhubbub.appspot.com/publish');
-define('HUB_URL_SUBSCRIBE', 'http://pubsubhubbub.appspot.com/subscribe');
+define('HUB_URL_PUBLISH', 'http://localhost:8080/publish');
+define('HUB_URL_SUBSCRIBE', 'http://localhost:8080/subscribe');
 define('FEED_FILE_PATH', dirname(__FILE__).'/../rss/rss.xml');
 define('FEED_URL_PATH', '/rss');
 

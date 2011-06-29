@@ -315,7 +315,7 @@ LIMIT 1";
 		return '"' . addslashes($date) . '"^^xsd:dateTime';
 	}
 
-    function add2rssfile($uri, $ocontent, $date, $name, $turtle) {
+    function add2rssfile($uri, $ocontent, $date, $name, $turtle, $access_space) {
 
         $xml = new DOMDocument();
         
@@ -341,7 +341,22 @@ LIMIT 1";
         $link = $xml->createElement("link");
         $link->appendChild($xml->createTextNode($uri));
         $item->appendChild($link);
-
+        
+        /*
+         * Pavan: Adding the queries as a node in the xml.
+         * 	TODO: For now there is only one query 
+         * 		for the prototype.
+         */ 
+        $access = $xml->createElement("access");
+        foreach($access_space as $access_query){
+        	error_log("DEBUG the queries SMOBTools: $access_query");
+        	$space = $xml->createElement("space");
+        	$space->appendChild($xml->createTextNode($access_query));
+        	$access->appendChild($space);
+        }
+		$item->appendChild($access);
+		//Pavan: End code
+		
         $content_encoded = $xml->createElement("content:encoded");
         $content_encoded->appendChild($xml->createCDATASection($turtle));
         $item->appendChild($content_encoded);
@@ -349,9 +364,36 @@ LIMIT 1";
         $xml->appendChild($item);
         
         $xml->formatOutput = true;
-        error_log("DEBUG: created new RSS item: ".$xml->saveXML($item),0);
+        //error_log("DEBUG: created new RSS item: ".$xml->saveXML($item),0);
         SMOBTools::additem2rssfile($item);
     }
+    
+//    /**
+//     * Pavan: This function for now extracts the hashtags and 
+//     * 		  provides specific sparql queries (Static)
+//     * TODO: This function should take the hashtag (URI) as 
+//     * 		 the argument and provide the sparql queries by 
+//     * 		 querying the local ARC(RDF store). Use SMOBStore.php
+//     * 		 for querying 
+//     */
+//    function getAccessQuery($content){
+//    	preg_match_all('/#([a-z0-9-_]+)/', $content, $matches);
+//    	//here $matches[0] will contain the array of the hashtags and
+//    	//matches[1] will contain the array of without the hashes
+//		foreach($matches[1] as $hashtag){
+//			/*
+//		 		The Below code will query the ARC store for the queries
+//		 		$accessSelect = "SELECT ?query WHERE {GRAPH <$PPO_GRAPH> { <PPO: where clause>}}
+//				$result = $res = SMOBStore::query($accessSelect);
+//				Retrieve the appropriate results store it in a list/array	
+//		 	*/
+//			if($hashtag == "smob")
+//				return 'select ?callback where {?callback <callback-of> ?user .	?user <isfriendof> <http://localhost/smob> .}';
+//			}
+//		return 'select ?callback where {?callback <callback-of> ?user . ?user <issubscribedto> <http://localhost/smob> .	}';
+//		
+//		
+//    }
     
     function additem2rssfile($item) {
 
@@ -373,14 +415,13 @@ LIMIT 1";
         //$lastitem = $item->getElementsByTagName("item")->last_child;
         $lastitem = $item->getElementsByTagName("item")->item(0);
         $root->insertBefore($item, $lastitem);
-        
-	    //$filesaved = $xml->save(FEED_FILE_PATH); 
+        //$filesaved = $xml->save(FEED_FILE_PATH); 
 	    // save the file formated
-        $rssfile = fopen(FEED_FILE_PATH,'w');
+	    $rssfile = fopen(FEED_FILE_PATH,'w');
         fwrite($rssfile, print_r($xml->saveXML(),1));
         fclose($rssfile);
         
-        error_log("DEBUG: saved RSS file : ".$xml->saveXML(),0);
+        //error_log("DEBUG: saved RSS file : ".$xml->saveXML(),0);
     }
     
     function additemstring2rssfile($itemstring) {
